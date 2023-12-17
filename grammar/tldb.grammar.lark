@@ -1,0 +1,15 @@
+query: insert
+
+STRING: /[a-zA-Z0-9]+/
+NUMBER: /[0-9]+/
+
+SENDER: STRING 
+RECIPIENT: STRING
+AMOUNT: NUMBER
+
+?insert: operation SENDER RECIPIENT AMOUNT
+
+operation: "insert" -> insert_operation
+
+%import common.WS
+%ignore WS
