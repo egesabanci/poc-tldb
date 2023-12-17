@@ -1,7 +1,7 @@
 query: insert
 
 STRING: /[a-zA-Z0-9]+/
-NUMBER: /[0-9]+/
+NUMBER: /[0-9.]+/
 
 SENDER: STRING 
 RECIPIENT: STRING

@@ -1,2 +1,0 @@
-from tldb_parser import TLDBParser
-from tldb_transformer import TLDBParserTransformer

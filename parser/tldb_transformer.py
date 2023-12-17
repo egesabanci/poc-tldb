@@ -1,11 +1,11 @@
 from time import time
 from lark import Transformer
-from typing import List, Union
+from typing import Union
 
-from enums import Operation
+from .enums import Operation
 
 class TLDBParserTransformer(Transformer):
-  def query(self, parsed: list) -> List[Operation, Union[str, None]]:
+  def query(self, parsed: list) -> Union[Operation, Union[Operation, str]]:
     """Converts query into desired format for WAL file
 
     Cases:
