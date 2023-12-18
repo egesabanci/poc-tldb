@@ -16,7 +16,7 @@ class TLDBParserTransformer(Transformer):
       case Operation.INSERT.value:
         ts: str = str(int(time()))
         operation, sender, recipient, amount = parsed[0].children 
-        return [Operation.INSERT, f"{operation}|{ts}|{sender}|{recipient}|{amount}\n"]
+        return [Operation.INSERT, f"{ts}|{sender}|{recipient}|{amount}\n"]
         
   def SENDER(self, token) -> str:
     return str(token)
