@@ -10,7 +10,7 @@ parser = TLDBParser.parser(grammar)
 transformer = TLDBParserTransformer()
 
 def test_insert_op_integer():
-  stdin = """insert 0x000 0x000 1"""
+  stdin = "insert 0x000 0x000 1"
   expected = "insert|0x000|0x000|1.0"
 
   tree = parser.parse(stdin)
@@ -21,7 +21,7 @@ def test_insert_op_integer():
   assert output == expected
 
 def test_insert_op_float():
-  stdin = """insert 0x000 0x000 1.2"""
+  stdin = "insert 0x000 0x000 1.2"
   expected = "insert|0x000|0x000|1.2"
 
   tree = parser.parse(stdin)

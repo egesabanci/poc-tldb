@@ -6,16 +6,17 @@ from .enums import Operation
 
 class TLDBParserTransformer(Transformer):
   def query(self, parsed: list) -> Union[Operation, Union[Operation, str]]:
-    """Converts query into desired format for WAL file
-
-    Cases:
-      INSERT OP -> INSERT SENDER RECIPIENT AMOUNT TIMESTAMP 
+    """
+    Parse client query request and returns operation necessities
+    
+    Returns:
+    - Union[Operation, Union[Operation, str]]
     """
     match parsed[0].children[0]:
       case Operation.INSERT.value:
         ts: str = str(int(time()))
         operation, sender, recipient, amount = parsed[0].children 
-        return [Operation.INSERT, f"{operation}|{sender}|{recipient}|{amount}|{ts}\n"]
+        return [Operation.INSERT, f"{operation}|{ts}|{sender}|{recipient}|{amount}\n"]
         
   def SENDER(self, token) -> str:
     return str(token)
