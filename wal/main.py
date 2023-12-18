@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from .tldb_wal import WAL
-from parser.tldb_parser import TLDBParser
-from parser.tldb_transformer import TLDBParserTransformer
+from .wal import WAL
+from parser.parser import TLDBParser
+from parser.transformer import TLDBParserTransformer
 
 if __name__ == "__main__":
   wal = WAL(capacity = 0.0001) # 100 bytes capacity

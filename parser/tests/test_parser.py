@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from ..tldb_parser import TLDBParser
-from ..tldb_transformer import TLDBParserTransformer
+from ..parser import TLDBParser
+from ..transformer import TLDBParserTransformer
 
 with open(Path(__file__).parent / "../tldb.grammar.lark", "r") as f:
   grammar = f.read()

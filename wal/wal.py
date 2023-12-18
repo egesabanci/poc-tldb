@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 class WAL:
   def __init__(self, capacity: int):
@@ -13,7 +12,11 @@ class WAL:
     """
     self.capacity = capacity * 1_048_576 # MiB in bytes
     self.filename = "tl.wal"
-    self.location = Path(__file__).parent / self.filename
+    self.savefolder = os.path.join(os.getcwd(), "var", "bin")
+    self.location = os.path.join(self.savefolder, self.filename)
+
+    if not os.path.exists(self.savefolder):
+      os.makedirs(self.savefolder)
 
   def row(self, log: str, safe: bool = False) -> None:
     """
