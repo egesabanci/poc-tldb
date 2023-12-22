@@ -1,34 +1,46 @@
 import os
-from typing import List, Union
+import sys
+from typing import Any
 
 class TLDBMemTable:
-  def __init__(self):
+  def __init__(self, capacity: int):
     self.wal_location = os.path.join(os.getcwd(), "var", "tl.wal")
     self.segfolder_location = os.path.join(os.getcwd(), "var", "bin")
-    self.logs = []
+    self.logs = dict()
+    self.capacity = capacity * 1_048_576
 
     # restore in-memory cache on crash recovery
     self._restore()
 
+  def __getattribute__(self, __name: str) -> Any:
+    if sys.getsizeof(self.logs) > self.capacity:
+      self.logs = dict()
+
   def cache(self, log: str) -> None:
-    self.logs.append(tuple(log.split("|")))
+    parsed = tuple(log.split("|"))
+    timestamp = int(parsed[0])
+    row = tuple(parsed[1:])
 
-  # TODO: implement fetch
-  def fetch(self, start: int, end: int) -> Union[List[tuple], None]:
-    pass
+    self.logs[timestamp] = row
+    return None
+
+  def get(self, timestamp: int):
+    row = self.logs.get(timestamp)
+    if row is not None:
+      return f"{timestamp}|{'|'.join(row)}"
+
+    return None
   
-  # TODO: implement range search on segmented disk files
-  def _range(self, start: int, end: int) -> Union[List[tuple], None]:
-    pass
+  def get_many(self, start: int, end: int):
+    keys = list(self.logs.keys())
+    min_, max_ = min(keys), max(keys)
 
-  # TODO: implement single timestamp fetch
-  def fetch_one(self, timestamp: int) -> tuple:
-    pass
-
-  # TODO: implement single timestamp search on segmented disk files
-  def _single(self, timestamp: int) -> tuple:
-    pass
-
+    if start >= min_ and end <= max_:
+      filtered_keys = filter(lambda x: x >= start and x <= end, keys)
+      return list(map(lambda x: self.logs[x], filtered_keys))
+    
+    return None
+  
   def _restore(self):
     recover: bool = self.logs == [] \
       and os.path.getsize(self.wal_location) != 0 

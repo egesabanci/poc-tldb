@@ -1,6 +1,6 @@
 import os
 
-class WAL:
+class TLDBWAL:
   def __init__(self, capacity: int):
     """Initialize new WAL class
 

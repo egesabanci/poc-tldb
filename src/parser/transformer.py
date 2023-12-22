@@ -1,23 +1,18 @@
 from time import time
 from lark import Transformer
-from typing import Union
 
 from .enums import Operation
 
 class TLDBParserTransformer(Transformer):
-  def query(self, parsed: list) -> Union[Operation, Union[Operation, str]]:
+  def query(self, parsed: list):
     """
     Parse client query request and returns operation necessities
     
     Returns:
     - Union[Operation, Union[Operation, str]]
     """
-    match parsed[0].children[0]:
-      case Operation.INSERT.value:
-        ts: str = str(int(time()))
-        operation, sender, recipient, amount = parsed[0].children 
-        return [Operation.INSERT, f"{ts}|{sender}|{recipient}|{amount}\n"]
-        
+    return parsed
+  
   def SENDER(self, token) -> str:
     return str(token)
   
@@ -27,5 +22,16 @@ class TLDBParserTransformer(Transformer):
   def AMOUNT(self, token) -> float:
     return float(token)
   
-  def insert_operation(self, _) -> str:
-    return "insert"
+  def TIMESTAMP(self, token) -> int:
+    return int(token)
+  
+  def insert(self, token):
+    ts: str = str(int(time()))
+    sender, recipient, amount = token 
+    return [Operation.INSERT, f"{ts}|{sender}|{recipient}|{amount}\n"]
+    
+  def range(self, token):
+    return [Operation.FETCH, token]
+  
+  def single(self, token):
+    return [Operation.FETCHONE, token]
