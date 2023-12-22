@@ -3,6 +3,7 @@ from typing import Union, List, Any
 
 from ..wal.wal import TLDBWAL
 from ..mem.memtable import TLDBMemTable
+from ..disk.search import TLDBDiskSearch
 
 from ..parser.parser import TLDBParser
 from ..parser.transformer import TLDBParserTransformer
@@ -13,6 +14,7 @@ class TLDB:
   def __init__(self, wal_capacity: float, memtable_capacity: float):
     self.WAL = TLDBWAL(capacity = wal_capacity)
     self.mem = TLDBMemTable(capacity = memtable_capacity)
+    self._disk = TLDBDiskSearch() 
 
     with open(os.path.join(os.getcwd(), "src", "parser", "tldb.grammar.lark"), "r") as f:
       grammar = f.read()
@@ -47,7 +49,7 @@ class TLDB:
     self.WAL.row(log)
     self.mem.cache(log)
 
-  def _fetch(self, start: int, end: int):
+  def _fetch(self, start: float, end: float):
     logs = self.mem.get_many(start, end)
     if logs:
       return logs
@@ -55,10 +57,13 @@ class TLDB:
     # TODO: implement disk search for fetch many
     pass
 
-  def _fetch_one(self, timestamp: int):
+  def _fetch_one(self, timestamp: float):
     log = self.mem.get(timestamp)
     if log:
-      return [log]
+      return log
     
-    # TODO: implement disk search for fetch one
-    pass
+    disk_search = self._disk.search_single(timestamp)
+    if disk_search:
+      return disk_search
+    
+    return None
