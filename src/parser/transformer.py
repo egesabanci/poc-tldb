@@ -11,8 +11,7 @@ class TLDBParserTransformer(Transformer):
     Returns:
     - Union[Operation, Union[Operation, str]]
     """
-    print(parsed)
-    return parsed
+    return parsed[0]
   
   def SENDER(self, token) -> str:
     return str(token)
@@ -24,10 +23,10 @@ class TLDBParserTransformer(Transformer):
     return float(token)
   
   def TIMESTAMP(self, token) -> int:
-    return int(token)
+    return float(token)
   
   def insert(self, token):
-    ts: str = str(int(time()))
+    ts: str = str(time())
     sender, recipient, amount = token 
     return [Operation.INSERT, f"{ts}|{sender}|{recipient}|{amount}\n"]
     

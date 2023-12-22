@@ -1,4 +1,5 @@
 import os
+from typing import Union, List, Any
 
 from ..wal.wal import TLDBWAL
 from ..mem.memtable import TLDBMemTable
@@ -9,11 +10,11 @@ from ..parser.transformer import TLDBParserTransformer
 from ..parser.enums import Operation
 
 class TLDB:
-  def __init__(self, wal_capacity: int):
+  def __init__(self, wal_capacity: float, memtable_capacity: float):
     self.WAL = TLDBWAL(capacity = wal_capacity)
-    self.mem = TLDBMemTable()
+    self.mem = TLDBMemTable(capacity = memtable_capacity)
 
-    with open(os.path.join(os.getcwd(), "parser", "tldb.grammar.lark", "r")) as f:
+    with open(os.path.join(os.getcwd(), "src", "parser", "tldb.grammar.lark"), "r") as f:
       grammar = f.read()
 
     self._parser = TLDBParser().parser(grammar)
@@ -23,12 +24,25 @@ class TLDB:
     tree = self._parser.parse(query_str)
     return self._transformer.transform(tree)
 
-  def query(self, query: str):
-    op, log = self._query_transformer(query)
-    match op:
-      case Operation.INSERT.value:
-        self.insert(log)
+  def query(self, query: str) -> Union[None, List[Any]]:
+    op, transformed = self._query_transformer(query)
 
+    match op:
+      case Operation.INSERT:
+        self._insert(transformed)
+        return None
+
+      case Operation.FETCHONE:
+        ts = transformed[0]
+        return self._fetch_one(ts)
+      
+      case Operation.FETCH:
+        start, end = transformed
+        return self._fetch(start, end)
+      
+      case _:
+        raise Exception("Operation is not recognized")
+        
   def _insert(self, log: str):
     self.WAL.row(log)
     self.mem.cache(log)
@@ -44,7 +58,7 @@ class TLDB:
   def _fetch_one(self, timestamp: int):
     log = self.mem.get(timestamp)
     if log:
-      return log
+      return [log]
     
     # TODO: implement disk search for fetch one
     pass

@@ -1,7 +1,7 @@
 import os
 
 class TLDBWAL:
-  def __init__(self, capacity: int):
+  def __init__(self, capacity: float):
     """Initialize new WAL class
 
     Parameters:
@@ -19,7 +19,7 @@ class TLDBWAL:
     if not os.path.exists(self.savefolder):
       os.makedirs(self.savefolder)
 
-  def row(self, log: str, safe: bool = False) -> None:
+  def row(self, log: str) -> None:
     """
     Creates new log row in Write Ahead Log and fsync into disk
     
@@ -32,8 +32,7 @@ class TLDBWAL:
     """
 
     exists_and_full_capacity = os.path.exists(self.location) \
-      and self._get_current_capacity() > self.capacity \
-      and safe
+      and self._get_current_capacity() > self.capacity
     
     if exists_and_full_capacity:
       self._sweep_and_create()

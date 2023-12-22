@@ -1,9 +1,8 @@
 import os
 import sys
-from typing import Any
 
 class TLDBMemTable:
-  def __init__(self, capacity: int):
+  def __init__(self, capacity: float):
     self.wal_location = os.path.join(os.getcwd(), "var", "tl.wal")
     self.segfolder_location = os.path.join(os.getcwd(), "var", "bin")
     self.logs = dict()
@@ -12,13 +11,13 @@ class TLDBMemTable:
     # restore in-memory cache on crash recovery
     self._restore()
 
-  def __getattribute__(self, __name: str) -> Any:
+  def cache(self, log: str) -> None:
+    # if capacity is full - clears memtable
     if sys.getsizeof(self.logs) > self.capacity:
       self.logs = dict()
 
-  def cache(self, log: str) -> None:
     parsed = tuple(log.split("|"))
-    timestamp = int(parsed[0])
+    timestamp = float(parsed[0])
     row = tuple(parsed[1:])
 
     self.logs[timestamp] = row
@@ -27,7 +26,7 @@ class TLDBMemTable:
   def get(self, timestamp: int):
     row = self.logs.get(timestamp)
     if row is not None:
-      return f"{timestamp}|{'|'.join(row)}"
+      return [*row[0:-1], float(row[-1].replace("\n", ""))]
 
     return None
   
@@ -42,10 +41,13 @@ class TLDBMemTable:
     return None
   
   def _restore(self):
-    recover: bool = self.logs == [] \
+    recover: bool = len(self.logs.keys()) == 0 \
+      and os.path.exists(self.wal_location) \
       and os.path.getsize(self.wal_location) != 0 
-
-    if recover:
+  
+    if recover: 
       with open(self.wal_location, "r") as f:
-        lines = f.readlines()[2:]
-        map(lambda log: self.logs.append((log.split("|"))), lines)
+        lines = f.readlines()[1:]
+        for i in lines:
+          parsed = i.split("|")
+          self.logs[float(parsed[0])] = tuple(parsed[1:])
