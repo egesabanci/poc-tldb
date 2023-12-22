@@ -11,6 +11,7 @@ class TLDBParserTransformer(Transformer):
     Returns:
     - Union[Operation, Union[Operation, str]]
     """
+    print(parsed)
     return parsed
   
   def SENDER(self, token) -> str:

@@ -1,4 +1,4 @@
-query: (insert | range | single)
+query: (insert | single | range)
 
 STRING: /[a-zA-Z0-9]+/
 NUMBER: /[0-9.]+/
@@ -8,9 +8,9 @@ RECIPIENT: STRING
 AMOUNT: NUMBER
 TIMESTAMP: NUMBER
 
-?insert: "insert" (SENDER "->" RECIPIENT ":" AMOUNT)
-?single: "single" ("->" TIMESTAMP)
-?range: "range" (TIMESTAMP ".." TIMESTAMP)
+?insert: "insert" (SENDER "->" RECIPIENT ":" AMOUNT) -> insert
+?single: "single" ("->" TIMESTAMP) -> single
+?range: "range" (TIMESTAMP ".." TIMESTAMP) -> range
 
 %import common.WS
 %ignore WS
