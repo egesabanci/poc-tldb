@@ -54,8 +54,12 @@ class TLDB:
     if logs:
       return logs
 
-    # TODO: implement disk search for fetch many
-    pass
+    disk_range_search = self._disk.search_many(start, end)
+    if disk_range_search and disk_range_search != []:
+      return disk_range_search
+    
+    return None
+    
 
   def _fetch_one(self, timestamp: float):
     log = self.mem.get(timestamp)
