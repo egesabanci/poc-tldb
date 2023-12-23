@@ -3,7 +3,7 @@ from flask import Flask, request
 from ..tldb.tldb import TLDB
 
 api: Flask = Flask(__name__)
-database = TLDB(wal_capacity = 0.0001, memtable_capacity= 0.001)
+database = TLDB(wal_capacity = 100, memtable_capacity= 150)
 
 @api.route("/", methods = ["POST"])
 def handle():
