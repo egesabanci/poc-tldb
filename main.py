@@ -1,6 +1,6 @@
 from flask import Flask, request
 
-from ..tldb.tldb import TLDB
+from src.tldb.tldb import TLDB
 
 api: Flask = Flask(__name__)
 database = TLDB(wal_capacity = 100, memtable_capacity= 150)
