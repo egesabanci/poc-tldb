@@ -13,4 +13,4 @@ def handle():
   return {"response": res} 
 
 if __name__ == "__main__":
-  api.run(host = "localhost", port = 5199)
+  api.run(host = "0.0.0.0", port = 5199)
